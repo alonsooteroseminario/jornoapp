@@ -1,62 +1,50 @@
 'use client'
 
-import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { addEntry } from '@/store/timesheetSlice'
+import { addEntry, TimesheetEntry } from '@/store/timesheetSlice'
 import type { RootState, AppDispatch } from '@/store/store'
+import { TransportForm } from './components/TransportForm'
 
 export default function Home() {
-  const [date, setDate] = useState('')
-  const [hours, setHours] = useState('')
   const dispatch = useDispatch<AppDispatch>()
   const entries = useSelector((state: RootState) => state.timesheet.entries)
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    dispatch(addEntry({ date, hours: parseFloat(hours) }))
-    setDate('')
-    setHours('')
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleFormSubmit = (formData: any) => {
+    // Calculate total hours worked
+    const startTime = new Date(`2000-01-01 ${formData.startTime} ${formData.startAmPm.toUpperCase()}`)
+    const endTime = new Date(`2000-01-01 ${formData.endTime} ${formData.endAmPm.toUpperCase()}`)
+    const hoursWorked = (endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60)
+
+    const newEntry: TimesheetEntry = {
+      date: formData.date,
+      hours: hoursWorked,
+      client: formData.client,
+      chantier: formData.chantier,
+      sousTraitant: formData.sousTraitant,
+      plaque: formData.plaque,
+      vehicleType: formData.vehicleType,
+      totalHeuresSimple: formData.totalHeuresSimple,
+      totalHeuresDouble: formData.totalHeuresDouble,
+      totalVoyageSimple: formData.totalVoyageSimple,
+      totalVoyageDouble: formData.totalVoyageDouble,
+      infoVoyage: formData.infoVoyage,
+      acceptePar: formData.acceptePar
+    }
+
+    dispatch(addEntry(newEntry))
   }
 
   return (
     <main className="container mx-auto p-4 bg-white text-black">
       <h1 className="text-2xl font-bold mb-4">Camion Driver Timesheet</h1>
-      <form onSubmit={handleSubmit} className="mb-4">
-        <div className="mb-2">
-          <label htmlFor="date" className="block">Date:</label>
-          <input
-            type="date"
-            id="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            required
-            className="border p-1 text-black bg-white"
-          />
-        </div>
-        <div className="mb-2">
-          <label htmlFor="hours" className="block">Hours Worked:</label>
-          <input
-            type="number"
-            id="hours"
-            value={hours}
-            onChange={(e) => setHours(e.target.value)}
-            required
-            step="0.5"
-            min="0"
-            max="24"
-            className="border p-1 text-black bg-white"
-          />
-        </div>
-        <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">
-          Add Entry
-        </button>
-      </form>
-      <div>
+      <TransportForm onSubmit={handleFormSubmit} />
+      <div className="mt-8">
         <h2 className="text-xl font-semibold mb-2">Entries:</h2>
         <ul>
           {entries.map((entry, index) => (
             <li key={index} className="mb-1">
-              {entry.date}: {entry.hours} hours
+              {entry.date}: {entry.hours.toFixed(2)} hours - {entry.client} ({entry.chantier})
             </li>
           ))}
         </ul>

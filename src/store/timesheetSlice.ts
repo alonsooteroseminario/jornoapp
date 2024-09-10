@@ -1,12 +1,23 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
-interface TimesheetEntry {
-  date: string
-  hours: number
+export interface TimesheetEntry {
+  date: string;
+  hours: number;
+  client: string;
+  chantier: string;
+  sousTraitant: string;
+  plaque: string;
+  vehicleType: string;
+  totalHeuresSimple: string;
+  totalHeuresDouble: string;
+  totalVoyageSimple: string;
+  totalVoyageDouble: string;
+  infoVoyage: string;
+  acceptePar: string;
 }
 
 interface TimesheetState {
-  entries: TimesheetEntry[]
+  entries: TimesheetEntry[];
 }
 
 const initialState: TimesheetState = {
@@ -24,4 +35,5 @@ export const timesheetSlice = createSlice({
 })
 
 export const { addEntry } = timesheetSlice.actions
+
 export default timesheetSlice.reducer
