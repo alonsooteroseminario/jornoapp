@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { addEntry } from '@/store/timesheetSlice'
-import type { RootState, AppDispatch } from '@/lib/store'
+import type { RootState, AppDispatch } from '@/store/store'
 
 export default function Home() {
   const [date, setDate] = useState('')
