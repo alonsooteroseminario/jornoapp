@@ -30,61 +30,65 @@ const TransportInvoice: React.FC<TransportInvoiceProps> = ({
   invoiceNumber
 }) => {
   return (
-    <div className="bg-white p-4 shadow-md rounded-lg max-w-2xl mx-auto">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold">S Racine TRANSPORT</h2>
-        <div className="text-sm">
-          <p>40 rue Gélinas</p>
-          <p>Laval, Qc H7M 2Z5</p>
-          <p>Répartiteur: 514.791.6911</p>
-          <p>Bureau: 450.629.6911</p>
-          <p>Cell: 514.241.4409</p>
-          <p>9217-7450 Québec inc. | info@transportracine.com</p>
+    <div className="bg-white shadow-lg rounded-lg overflow-hidden max-w-4xl mx-auto my-8">
+      <div className="bg-gray-800 text-white p-6">
+        <div className="flex flex-col md:flex-row justify-between items-center">
+          <h2 className="text-3xl font-bold mb-4 md:mb-0">S Racine TRANSPORT</h2>
+          <div className="text-sm text-right">
+            <p>40 rue Gélinas, Laval, Qc H7M 2Z5</p>
+            <p>Répartiteur: 514.791.6911 | Bureau: 450.629.6911</p>
+            <p>Cell: 514.241.4409 | info@transportracine.com</p>
+            <p>9217-7450 Québec inc.</p>
+          </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 mb-4">
-        <div>
-          <p><strong>DATE:</strong> {date}</p>
-          <p><strong>CHAUFFEUR:</strong> {driver}</p>
-          <p><strong>LOUÉ À:</strong> {client}</p>
-          <p><strong>CHANTIER:</strong> {site}</p>
+      <div className="p-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div className="space-y-2">
+            <p><span className="font-semibold">DATE:</span> {date}</p>
+            <p><span className="font-semibold">CHAUFFEUR:</span> {driver}</p>
+            <p><span className="font-semibold">LOUÉ À:</span> {client}</p>
+            <p><span className="font-semibold">CHANTIER:</span> {site}</p>
+          </div>
+          <div className="space-y-2">
+            <p><span className="font-semibold">PLAQUE:</span> {plate}</p>
+            <p><span className="font-semibold">UNITÉ #:</span> {unit}</p>
+            <p><span className="font-semibold">TYPE DE VÉHICULE:</span> {vehicleType}</p>
+          </div>
         </div>
-        <div>
-          <p><strong>PLAQUE:</strong> {plate}</p>
-          <p><strong>UNITÉ #:</strong> {unit}</p>
-          <p><strong>TYPE DE VÉHICULE:</strong> {vehicleType}</p>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="p-2 border">DESCRIPTION</th>
+                <th className="p-2 border">DE</th>
+                <th className="p-2 border">À</th>
+                <th className="p-2 border">HEURES</th>
+              </tr>
+            </thead>
+            <tbody>
+              {timeEntries.map((entry, index) => (
+                <tr key={index} className={index % 2 === 0 ? 'bg-gray-50' : ''}>
+                  <td className="p-2 border">{index === 0 ? 'Travail régulier' : ''}</td>
+                  <td className="p-2 border text-center">{entry.from}</td>
+                  <td className="p-2 border text-center">{entry.to}</td>
+                  <td className="p-2 border text-center">{entry.hours}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-      </div>
 
-      <table className="w-full mb-4">
-        <thead>
-          <tr>
-            <th className="text-left">DESCRIPTION</th>
-            <th>DE</th>
-            <th>À</th>
-            <th>HEURES</th>
-          </tr>
-        </thead>
-        <tbody>
-          {timeEntries.map((entry, index) => (
-            <tr key={index}>
-              <td>{index === 0 ? 'Travail régulier' : ''}</td>
-              <td className="text-center">{entry.from}</td>
-              <td className="text-center">{entry.to}</td>
-              <td className="text-center">{entry.hours}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+        <div className="flex flex-col md:flex-row justify-between items-center mt-6">
+          <p className="text-lg"><span className="font-semibold">TOTAL HEURES:</span> {totalHours}</p>
+          <p className="text-lg"><span className="font-semibold">NO. FACTURE:</span> {invoiceNumber}</p>
+        </div>
 
-      <div className="flex justify-between items-center mt-4">
-        <p><strong>TOTAL HEURES:</strong> {totalHours}</p>
-        <p><strong>NO. FACTURE:</strong> {invoiceNumber}</p>
-      </div>
-
-      <div className="mt-8 border-t pt-4">
-        <p className="text-sm text-gray-600">Signature du client: _________________________</p>
+        <div className="mt-8 pt-4 border-t border-gray-300">
+          <p className="text-sm text-gray-600">Signature du client: _________________________</p>
+        </div>
       </div>
     </div>
   );
