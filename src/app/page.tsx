@@ -1,89 +1,121 @@
-'use client'
+import { ECLEnterpriseForm } from '@/app/components/ECLEnterpriseForm'
+import Header from '@/app/components/Header'
+import { dateConverter } from '@/lib/utils'
+import { SignedIn, UserButton } from '@clerk/nextjs'
+import { currentUser } from '@clerk/nextjs/server'
+import Link from 'next/link'
+import { redirect } from 'next/navigation'
 
-import { useDispatch, useSelector } from 'react-redux'
-import { addEntry, TimesheetEntry } from '@/store/timesheetSlice'
-import type { RootState, AppDispatch } from '@/store/store'
-import { TransportForm } from './components/TransportForm'
-import TransportInvoice from './components/TransportInvoice'
 
-export default function Home() {
-  const dispatch = useDispatch<AppDispatch>()
-  const entries = useSelector((state: RootState) => state.timesheet.entries)
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleFormSubmit = (formData: any) => {
-    // Calculate total hours worked
-    const startTime = new Date(`2000-01-01 ${formData.startTime} ${formData.startAmPm.toUpperCase()}`)
-    const endTime = new Date(`2000-01-01 ${formData.endTime} ${formData.endAmPm.toUpperCase()}`)
-    const hoursWorked = (endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60)
-
-    const newEntry: TimesheetEntry = {
-      date: formData.date,
-      hours: hoursWorked,
-      client: formData.client,
-      chantier: formData.chantier,
-      sousTraitant: formData.sousTraitant,
-      plaque: formData.plaque,
-      vehicleType: formData.vehicleType,
-      totalHeuresSimple: formData.totalHeuresSimple,
-      totalHeuresDouble: formData.totalHeuresDouble,
-      totalVoyageSimple: formData.totalVoyageSimple,
-      totalVoyageDouble: formData.totalVoyageDouble,
-      infoVoyage: formData.infoVoyage,
-      acceptePar: formData.acceptePar
-    }
-
-    dispatch(addEntry(newEntry))
+const Home = async () => {
+  const clerkUser = await currentUser();
+  if(!clerkUser) redirect('/sign-in');
+  const roomDocuments = {data: [{
+    id: 'bbmnbuzENy1880cyVryz-',
+    metadata: {
+      name: 'Document 1',
+      description: 'This is a description for document 1',
+      createdBy: 'John Doe',
+      createdAt: '2022-01-01',
+      updatedAt: '2022-01-01',
+      status: 'Draft',
+      statusUpdatedAt: '2022-01-01',
+    },
+  },{
+    id: 'cdRnthzXOp3902bvUstw-',
+    metadata: {
+      name: 'Document 2',
+      description: 'This is a description for document 2',
+      createdBy: 'John Doe',
+      createdAt: '2022-01-01',
+      updatedAt: '2022-01-01',
+      status: 'Draft',
+      statusUpdatedAt: '2022-01-01',
+    },
+  },{
+    id: 'efTqjuyCNm4013awZrxv-',
+    metadata: {
+      name: 'Document 3',
+      description: 'This is a description for document 3',
+      createdBy: 'John Doe',
+      createdAt: '2022-01-01',
+      updatedAt: '2022-01-01',
+      status: 'Draft',
+      statusUpdatedAt: '2022-01-01',
+    },
+  },{
+    id: 'ghVslwzABo5124cxYqtu-',
+    metadata: {
+      name: 'Document 4',
+      description: 'This is a description for document 4',
+      createdBy: 'John Doe',
+      createdAt: '2022-01-01',
+      updatedAt: '2022-01-01',
+      status: 'Draft',
+      statusUpdatedAt: '2022-01-01',
+    },
+  },{
+    id: 'ijXunxzCDp6235dyWsvr-',
+    metadata: {
+      name: 'Document 5',
+      description: 'This is a description for document 5',
+      createdBy: 'John Doe',
+      createdAt: '2022-01-01',
+      updatedAt: '2022-01-01',
+      status: 'Draft',
+      statusUpdatedAt: '2022-01-01',
+    },
   }
 
-  // Sample data for the TransportInvoice component
-  const sampleInvoiceData = {
-    date: '29-08-24',
-    driver: 'S. BREARD',
-    client: 'POMERLEAU',
-    site: 'JOB 23 0040 5RB PIE-IX',
-    plate: '964210',
-    unit: '23-20',
-    vehicleType: '12 roues' as const,
-    timeEntries: [
-      { from: '07:30', to: '12:00', hours: '4 1/2' },
-      { from: '12:30', to: '15:00', hours: '2 1/2' },
-    ],
-    totalHours: '7.00',
-    invoiceNumber: '13906',
-  };
-
+]};
   return (
-    <div className="min-h-screen bg-gray-100">
-      <header className="bg-gray-800 text-white py-4">
-        <div className="container mx-auto px-4">
-          <h1 className="text-3xl font-bold">Camion Driver Timesheet</h1>
+  <main className="container mx-auto px-4">
+
+      <Header className="left-0 top-0 my-4">
+        <div className="flex items-center gap-2 lg:gap-4">
+          {<SignedIn>
+            <UserButton />
+          </SignedIn>}
         </div>
-      </header>
+      </Header>
 
-      <main className="container mx-auto px-4 py-8">
-        <section className="bg-white shadow-md rounded-lg p-6 mb-8">
-          <h2 className="text-2xl font-semibold mb-4">New Entry</h2>
-          <TransportForm onSubmit={handleFormSubmit} />
-        </section>
+      {roomDocuments.data.length > 0 ? (
+        <div className="document-list-container">
+          <div className="document-list-title">
+            <h3 className="text-28-semibold">All documents</h3>
 
-        <section className="bg-white shadow-md rounded-lg p-6 mb-8">
-          <h2 className="text-2xl font-semibold mb-4">Recent Entries</h2>
-          <ul className="divide-y divide-gray-200">
-            {entries.map((entry, index) => (
-              <li key={index} className="py-3">
-                <p className="text-lg">{entry.date}: <span className="font-semibold">{entry.hours.toFixed(2)} hours</span></p>
-                <p className="text-gray-600">{entry.client} - {entry.chantier}</p>
+          </div>
+          <ul className="document-ul">
+            {roomDocuments.data.map(({ id, metadata, createdAt }: any) => (
+              <li key={id} className="document-list-item">
+                <Link href={`/documents/${id}`} className="flex flex-1 items-center gap-4">
+                  <div className="hidden rounded-md bg-dark-500 p-2 sm:block">
+                    <p className="text-sm font-light text-blue-100">ID: {id}</p>
+                    <p className="text-sm font-light text-blue-100">Status: {metadata.status}</p>
+                    <p className="text-sm font-light text-blue-100">Updated about {dateConverter(metadata.statusUpdatedAt)}</p>
+                    <p className="text-sm font-light text-blue-100">Created by: {metadata.createdBy}</p>
+                    <p className="text-sm font-light text-blue-100">Updated about {dateConverter(metadata.updatedAt)}</p>
+                    <p className="text-sm font-light text-blue-100">Description: {metadata.description}</p>
+
+                  </div>
+                  <div className="space-y-1">
+                    <p className="line-clamp-1 text-lg">{metadata.title}</p>
+                    <p className="text-sm font-light text-blue-100">Created about {dateConverter(createdAt)}</p>
+                  </div>
+                </Link>
+
               </li>
             ))}
           </ul>
-        </section>
+        </div>
+      ): (
+        <div className="document-list-empty">
+          <h3 className="text-28-semibold">No documents found</h3>
+        </div>
+      )}
 
-        <section>
-          <h2 className="text-2xl font-semibold mb-4">Sample Invoice</h2>
-          <TransportInvoice {...sampleInvoiceData} />
-        </section>
-      </main>
-    </div>
+  </main>
   )
 }
+
+export default Home
