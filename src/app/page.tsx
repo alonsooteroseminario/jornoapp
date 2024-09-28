@@ -1,11 +1,11 @@
-import { ECLEnterpriseForm } from '@/app/components/ECLEnterpriseForm'
+import DocumentListItem from '@/app/components/DocumentListItem'
 import Header from '@/app/components/Header'
 import { dateConverter } from '@/lib/utils'
 import { SignedIn, UserButton } from '@clerk/nextjs'
 import { currentUser } from '@clerk/nextjs/server'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-
+import { FiFileText, FiTrash2 } from 'react-icons/fi'
 
 const Home = async () => {
   const clerkUser = await currentUser();
@@ -67,54 +67,56 @@ const Home = async () => {
     },
   }
 
-]};
+  ]};
+  const handleDelete = async (id: string) => {
+    'use server';
+    // Implement delete logic here
+    console.log('Delete document:', id);
+  };
   return (
-  <main className="container mx-auto px-4">
-
-      <Header className="left-0 top-0 my-4">
-        <div className="flex items-center gap-2 lg:gap-4">
-          {<SignedIn>
+    <div className="min-h-screen bg-gray-900 text-white">
+      <Header className="sticky top-0 bg-gray-800 z-10 p-4">
+        <div className="container mx-auto flex justify-between items-center">
+          <h1 className="text-2xl font-bold">Jorno App</h1>
+          <SignedIn>
             <UserButton />
-          </SignedIn>}
+          </SignedIn>
         </div>
       </Header>
 
-      {roomDocuments.data.length > 0 ? (
-        <div className="document-list-container">
-          <div className="document-list-title">
-            <h3 className="text-28-semibold">All documents</h3>
+      <main className="container mx-auto px-4 py-8">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-3xl font-bold">All documents</h2>
+          <Link href="/documents/new" className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded cursor-pointer">
+            + Start a blank document
+          </Link>
+        </div>
 
+        <div className="bg-gray-800 rounded-lg p-4">
+          <div className="flex justify-between items-center text-sm text-gray-400 mb-4">
+            <span>Table Info</span>
           </div>
-          <ul className="document-ul">
-            {roomDocuments.data.map(({ id, metadata, createdAt }: any) => (
-              <li key={id} className="document-list-item">
-                <Link href={`/documents/${id}`} className="flex flex-1 items-center gap-4">
-                  <div className="hidden rounded-md bg-dark-500 p-2 sm:block">
-                    <p className="text-sm font-light text-blue-100">ID: {id}</p>
-                    <p className="text-sm font-light text-blue-100">Status: {metadata.status}</p>
-                    <p className="text-sm font-light text-blue-100">Updated about {dateConverter(metadata.statusUpdatedAt)}</p>
-                    <p className="text-sm font-light text-blue-100">Created by: {metadata.createdBy}</p>
-                    <p className="text-sm font-light text-blue-100">Updated about {dateConverter(metadata.updatedAt)}</p>
-                    <p className="text-sm font-light text-blue-100">Description: {metadata.description}</p>
 
-                  </div>
-                  <div className="space-y-1">
-                    <p className="line-clamp-1 text-lg">{metadata.title}</p>
-                    <p className="text-sm font-light text-blue-100">Created about {dateConverter(createdAt)}</p>
-                  </div>
-                </Link>
-
-              </li>
-            ))}
-          </ul>
+          {roomDocuments.data.length > 0 ? (
+            <ul className="space-y-4">
+              {roomDocuments.data.map(({ id, metadata }: any) => (
+                <DocumentListItem
+                  key={id}
+                  id={id}
+                  name={metadata.name}
+                  createdAt={dateConverter(metadata.createdAt)}
+                  onDelete={handleDelete}
+                />
+              ))}
+            </ul>
+          ) : (
+            <div className="text-center py-8">
+              <h3 className="text-xl font-semibold">No documents found</h3>
+            </div>
+          )}
         </div>
-      ): (
-        <div className="document-list-empty">
-          <h3 className="text-28-semibold">No documents found</h3>
-        </div>
-      )}
-
-  </main>
+      </main>
+    </div>
   )
 }
 

@@ -6,12 +6,9 @@ import { useRouter } from 'next/navigation';
 import { 
   useUser,
 } from '@clerk/nextjs'
-
 import React, { useEffect, useState } from 'react';
 
-
 export const ECLEnterpriseForm = () => {
-
   const clerkUser: any = useUser()
   const router = useRouter();
   useEffect(() => {
@@ -20,7 +17,6 @@ export const ECLEnterpriseForm = () => {
       router.push('/sign-in');
     }
   }, [clerkUser, router]);
-
   const dispatch = useAppDispatch();
   const { 
     form 
@@ -44,20 +40,16 @@ export const ECLEnterpriseForm = () => {
     numeroPlaque: '',
     signature: '',
   });
-
   useEffect(() => {
     console.log('form:', form);
   }, [form]);
-
   useEffect(() => {
     console.log('Form data:', formData);
     // SET_FORM_DATA
     dispatch(SET_FORM_DATA(formData));
 
   }, [dispatch, formData]);
-
   const [documentId, setDocumentId] = useState('');
-
   useEffect(() => {
     // This effect will only run in the browser
     if (typeof window !== 'undefined') {
@@ -71,13 +63,11 @@ export const ECLEnterpriseForm = () => {
 
 
   }, []);
-
   useEffect(() => {
     if(documentId !==``) {
         console.log('Document ID:', documentId);
     }
   }, [documentId]);
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prevData => ({
@@ -85,7 +75,6 @@ export const ECLEnterpriseForm = () => {
       [name]: value
     }));
   };
-
   const handleDateEntryChange = (index: number, field: string, value: string) => {
     const newDateEntries = formData.dateEntries.map((entry, i) => {
       if (i === index) {
@@ -98,27 +87,23 @@ export const ECLEnterpriseForm = () => {
       dateEntries: newDateEntries
     }));
   };
-
   const addDateEntry = () => {
     setFormData(prevData => ({
       ...prevData,
       dateEntries: [...prevData.dateEntries, { date: '', startTime: '', endTime: '', hours: '' }]
     }));
   };
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Form submitted:', formData);
   };
-
   const WatermarkTag = () => (
     <div className="">
       <p className="text-[9px] text-pink-600 font-semibold">Unique ID: {documentId}</p>
     </div>
   );
-
   return (
-    <div className="max-w-4xl mx-auto p-8 bg-pink-100 shadow-lg rounded-lg border-2 border-pink-300" style={{ fontFamily: 'Arial, sans-serif' }}>
+    <div className="text-pink-600 max-w-4xl mx-auto p-8 bg-pink-100 shadow-lg rounded-lg border-2 border-pink-300" style={{ fontFamily: 'Arial, sans-serif' }}>
       
         <div className="text-center mb-6 border-b-2 border-pink-300 pb-4">
             <h1 className="text-3xl font-bold text-pink-800">ECL ENTREPRISE</h1>
