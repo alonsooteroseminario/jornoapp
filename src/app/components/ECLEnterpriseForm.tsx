@@ -95,6 +95,7 @@ export const ECLEnterpriseForm = () => {
       // Dispatch the handleSubmitForm action
       const timeSheet: TimesheetEntry = {
         id: documentId,
+        userId: clerkUser.id,
         client: formData?.client,
         workLocation: formData?.workLocation,
         contractNumber: formData?.contractNumber,
