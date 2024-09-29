@@ -1,0 +1,49 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model TimesheetEntry {
+  id                 String   @id @default(auto()) @map("_id") @db.ObjectId
+  client             String
+  workLocation       String
+  contractNumber     String
+  dateEntries        DateEntry[]
+  totalHeuresSimple  String
+  totalHeuresDouble  String
+  totalVoyageSimple  String
+  totalVoyageDouble  String
+  materialTransported String
+  autresPrecisions   String
+  ejesCamion         String
+  numeroCamion       String
+  transporteur       String
+  nomChauffeur       String
+  numeroPlaque       String
+  signature          String
+  metadata           Metadata
+}
+
+type DateEntry {
+  date      String
+  startTime String
+  endTime   String
+  hours     String
+}
+
+type Metadata {
+  name             String
+  description      String
+  createdBy        String?
+  createdAt        String
+  updatedAt        String
+  status           String
+  statusUpdatedAt  String
+}

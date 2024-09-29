@@ -9,6 +9,8 @@ import { redirect } from "next/navigation";
 import { useEffect } from "react";
 
 const Document = async () => {
+    const clerkUser = await currentUser();
+    if(!clerkUser) redirect('/sign-in');
     const documentTitle = "Test for Mario Romero";
     return (
         <div className="flex flex-col min-h-screen bg-gray-900 text-white">

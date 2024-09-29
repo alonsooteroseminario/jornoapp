@@ -1,5 +1,5 @@
 import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit'
-import timesheetReducer from './timesheetSlice'
+import timesheetReducer from './slice/timesheetSlice'
 import formSlice from '@/store/slice/formSlice'
 
 export const store = configureStore({

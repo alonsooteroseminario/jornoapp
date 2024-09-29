@@ -10,24 +10,26 @@ interface DateEntry {
 }
 
 interface FormState {
-    form: {
-        client: string;
-        workLocation: string;
-        contractNumber: string;
-        dateEntries: DateEntry[];
-        totalHeuresSimple: string;
-        totalHeuresDouble: string;
-        totalVoyageSimple: string;
-        totalVoyageDouble: string;
-        materialTransported: string;
-        autresPrecisions: string;
-        ejesCamion: string;
-        numeroCamion: string;
-        transporteur: string;
-        nomChauffeur: string;
-        numeroPlaque: string;
-        signature: string;
-    } | any
+    form: FormDataProps| any
+}
+
+interface FormDataProps {
+    client: string;
+    workLocation: string;
+    contractNumber: string;
+    dateEntries: DateEntry[];
+    totalHeuresSimple: string;
+    totalHeuresDouble: string;
+    totalVoyageSimple: string;
+    totalVoyageDouble: string;
+    materialTransported: string;
+    autresPrecisions: string;
+    ejesCamion: string;
+    numeroCamion: string;
+    transporteur: string;
+    nomChauffeur: string;
+    numeroPlaque: string;
+    signature: string;
 }
 
 const initialState: FormState = {

@@ -7,49 +7,35 @@ import {
   useUser,
 } from '@clerk/nextjs'
 import React, { useEffect, useState } from 'react';
+import { FormDataProps, handleSubmitForm, MetadataProps, TimesheetEntry } from '@/store/slice/timesheetSlice';
+
 
 export const ECLEnterpriseForm = () => {
   const clerkUser: any = useUser()
   const router = useRouter();
-  useEffect(() => {
-    if(!clerkUser) {
-      console.log('No user found', clerkUser);
-      router.push('/sign-in');
-    }
-  }, [clerkUser, router]);
   const dispatch = useAppDispatch();
   const { 
     form 
   } = useAppSelector(state => state.form);
-  const [formData, setFormData] = useState({
-    form: '', // Add the 'form' property here
-    client: '',
-    workLocation: '',
-    contractNumber: '',
-    dateEntries: [{ date: '', startTime: '', endTime: '', hours: '' }],
-    totalHeuresSimple: '',
-    totalHeuresDouble: '',
-    totalVoyageSimple: '',
-    totalVoyageDouble: '',
-    materialTransported: '',
-    autresPrecisions: '',
-    ejesCamion: '',
-    numeroCamion: '',
-    transporteur: '',
-    nomChauffeur: '',
-    numeroPlaque: '',
-    signature: '',
-  });
-  useEffect(() => {
-    console.log('form:', form);
-  }, [form]);
-  useEffect(() => {
-    console.log('Form data:', formData);
-    // SET_FORM_DATA
-    dispatch(SET_FORM_DATA(formData));
-
-  }, [dispatch, formData]);
   const [documentId, setDocumentId] = useState('');
+  const [formData, setFormData] = useState<FormDataProps>({
+    client: form?.client || '',
+    workLocation: form?.workLocation || '',
+    contractNumber: form?.contractNumber || '',
+    dateEntries: form?.dateEntries || [{ date: '', startTime: '', endTime: '', hours: '' }],
+    totalHeuresSimple: form?.totalHeuresSimple || '',
+    totalHeuresDouble: form?.totalHeuresDouble || '',
+    totalVoyageSimple: form?.totalVoyageSimple || '',
+    totalVoyageDouble: form?.totalVoyageDouble || '',
+    materialTransported: form?.materialTransported || '',
+    autresPrecisions: form?.autresPrecisions || '',
+    ejesCamion: form?.ejesCamion || '',
+    numeroCamion: form?.numeroCamion || '',
+    transporteur: form?.transporteur || '',
+    nomChauffeur: form?.nomChauffeur || '',
+    numeroPlaque: form?.numeroPlaque || '',
+    signature: form?.signature || '',
+  });
   useEffect(() => {
     // This effect will only run in the browser
     if (typeof window !== 'undefined') {
@@ -59,10 +45,18 @@ export const ECLEnterpriseForm = () => {
       const id = parts[parts.length - 1];
       setDocumentId(id);
     }
-
-
-
   }, []);
+  useEffect(() => {
+    if(!clerkUser) {
+      console.log('No user found', clerkUser);
+      router.push('/sign-in');
+    }
+  }, [clerkUser, router]);
+  useEffect(() => {
+    console.log('Form data:', formData);
+    dispatch(SET_FORM_DATA(formData));
+
+  }, [dispatch, formData]);
   useEffect(() => {
     if(documentId !==``) {
         console.log('Document ID:', documentId);
@@ -70,32 +64,71 @@ export const ECLEnterpriseForm = () => {
   }, [documentId]);
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prevData => ({
+    setFormData((prevData : any) => ({
       ...prevData,
       [name]: value
     }));
   };
   const handleDateEntryChange = (index: number, field: string, value: string) => {
-    const newDateEntries = formData.dateEntries.map((entry, i) => {
+    const newDateEntries = formData.dateEntries.map((entry: any, i: any) => {
       if (i === index) {
         return { ...entry, [field]: value };
       }
       return entry;
     });
-    setFormData(prevData => ({
+    setFormData((prevData : any) => ({
       ...prevData,
       dateEntries: newDateEntries
     }));
   };
   const addDateEntry = () => {
-    setFormData(prevData => ({
+    setFormData((prevData : any) => ({
       ...prevData,
-      dateEntries: [...prevData.dateEntries, { date: '', startTime: '', endTime: '', hours: '' }]
+      dateEntries: [...prevData?.dateEntries, { date: '', startTime: '', endTime: '', hours: '' }]
     }));
   };
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Form submitted:', formData);
+
+    try {
+      // Dispatch the handleSubmitForm action
+      const timeSheet: TimesheetEntry = {
+        id: documentId,
+        client: formData?.client,
+        workLocation: formData?.workLocation,
+        contractNumber: formData?.contractNumber,
+        dateEntries: formData?.dateEntries,
+        totalHeuresSimple: formData?.totalHeuresSimple,
+        totalHeuresDouble: formData?.totalHeuresDouble,
+        totalVoyageSimple: formData?.totalVoyageSimple,
+        totalVoyageDouble: formData?.totalVoyageDouble,
+        materialTransported: formData?.materialTransported,
+        autresPrecisions: formData?.autresPrecisions,
+        ejesCamion: formData?.ejesCamion,
+        numeroCamion: formData?.numeroCamion,
+        transporteur: formData?.transporteur,
+        nomChauffeur: formData?.nomChauffeur,
+        numeroPlaque: formData?.numeroPlaque,
+        signature: formData?.signature,
+        metadata: {
+          name: 'Document 3',
+          description: 'This is a description for document 3',
+          createdBy: clerkUser.fullName,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          status: 'Draft',
+          statusUpdatedAt: new Date().toISOString(),
+        },
+      }
+      const resultAction = await dispatch(handleSubmitForm(timeSheet)).unwrap();
+      console.log('Form submission successful:', resultAction);
+
+
+    } catch (error) {
+      console.error('Failed to submit form:', error);
+      // Handle the error (e.g., show an error message to the user)
+    }
   };
   const WatermarkTag = () => (
     <div className="">
@@ -122,7 +155,7 @@ export const ECLEnterpriseForm = () => {
               type="text"
               id="client"
               name="client"
-              value={formData.client}
+              value={formData?.client}
               onChange={handleInputChange}
               className="mt-1 block w-full border-b border-pink-300 bg-transparent focus:border-pink-500 focus:ring-0"
             />
@@ -133,7 +166,7 @@ export const ECLEnterpriseForm = () => {
               type="text"
               id="workLocation"
               name="workLocation"
-              value={formData.workLocation}
+              value={formData?.workLocation}
               onChange={handleInputChange}
               className="mt-1 block w-full border-b border-pink-300 bg-transparent focus:border-pink-500 focus:ring-0"
             />
@@ -145,7 +178,7 @@ export const ECLEnterpriseForm = () => {
             type="text"
             id="contractNumber"
             name="contractNumber"
-            value={formData.contractNumber}
+            value={formData?.contractNumber}
             onChange={handleInputChange}
             className="mt-1 block w-full border-b border-pink-300 bg-transparent focus:border-pink-500 focus:ring-0"
           />
@@ -163,7 +196,7 @@ export const ECLEnterpriseForm = () => {
               </tr>
             </thead>
             <tbody>
-              {formData.dateEntries.map((entry, index) => (
+              {formData?.dateEntries?.map((entry: any, index: any) => (
                 <tr key={index} className="border-b border-pink-300">
                   <td className="px-4 py-2 border-r border-pink-300">
                     <input
@@ -218,7 +251,7 @@ export const ECLEnterpriseForm = () => {
               type="number"
               id="totalHeuresSimple"
               name="totalHeuresSimple"
-              value={formData.totalHeuresSimple}
+              value={formData?.totalHeuresSimple}
               onChange={handleInputChange}
               className="mt-1 block w-full border-b border-pink-300 bg-transparent focus:border-pink-500 focus:ring-0"
             />
@@ -229,7 +262,7 @@ export const ECLEnterpriseForm = () => {
               type="number"
               id="totalHeuresDouble"
               name="totalHeuresDouble"
-              value={formData.totalHeuresDouble}
+              value={formData?.totalHeuresDouble}
               onChange={handleInputChange}
               className="mt-1 block w-full border-b border-pink-300 bg-transparent focus:border-pink-500 focus:ring-0"
             />
@@ -242,7 +275,7 @@ export const ECLEnterpriseForm = () => {
               type="number"
               id="totalVoyageSimple"
               name="totalVoyageSimple"
-              value={formData.totalVoyageSimple}
+              value={formData?.totalVoyageSimple}
               onChange={handleInputChange}
               className="mt-1 block w-full border-b border-pink-300 bg-transparent focus:border-pink-500 focus:ring-0"
             />
@@ -253,7 +286,7 @@ export const ECLEnterpriseForm = () => {
               type="number"
               id="totalVoyageDouble"
               name="totalVoyageDouble"
-              value={formData.totalVoyageDouble}
+              value={formData?.totalVoyageDouble}
               onChange={handleInputChange}
               className="mt-1 block w-full border-b border-pink-300 bg-transparent focus:border-pink-500 focus:ring-0"
             />
@@ -268,7 +301,7 @@ export const ECLEnterpriseForm = () => {
               type="text"
               id="materialTransported"
               name="materialTransported"
-              value={formData.materialTransported}
+              value={formData?.materialTransported}
               onChange={handleInputChange}
               className="mt-1 block w-full border-b border-pink-300 bg-transparent focus:border-pink-500 focus:ring-0"
             />
@@ -279,7 +312,7 @@ export const ECLEnterpriseForm = () => {
               type="text"
               id="autresPrecisions"
               name="autresPrecisions"
-              value={formData.autresPrecisions}
+              value={formData?.autresPrecisions}
               onChange={handleInputChange}
               className="mt-1 block w-full border-b border-pink-300 bg-transparent focus:border-pink-500 focus:ring-0"
             />
@@ -292,7 +325,7 @@ export const ECLEnterpriseForm = () => {
               type="text"
               id="ejesCamion"
               name="ejesCamion"
-              value={formData.ejesCamion}
+              value={formData?.ejesCamion}
               onChange={handleInputChange}
               className="mt-1 block w-full border-b border-pink-300 bg-transparent focus:border-pink-500 focus:ring-0"
             />
@@ -303,7 +336,7 @@ export const ECLEnterpriseForm = () => {
               type="text"
               id="numeroCamion"
               name="numeroCamion"
-              value={formData.numeroCamion}
+              value={formData?.numeroCamion}
               onChange={handleInputChange}
               className="mt-1 block w-full border-b border-pink-300 bg-transparent focus:border-pink-500 focus:ring-0"
             />
@@ -316,7 +349,7 @@ export const ECLEnterpriseForm = () => {
               type="text"
               id="transporteur"
               name="transporteur"
-              value={formData.transporteur}
+              value={formData?.transporteur}
               onChange={handleInputChange}
               className="mt-1 block w-full border-b border-pink-300 bg-transparent focus:border-pink-500 focus:ring-0"
             />
@@ -327,7 +360,7 @@ export const ECLEnterpriseForm = () => {
               type="text"
               id="nomChauffeur"
               name="nomChauffeur"
-              value={formData.nomChauffeur}
+              value={formData?.nomChauffeur}
               onChange={handleInputChange}
               className="mt-1 block w-full border-b border-pink-300 bg-transparent focus:border-pink-500 focus:ring-0"
             />
@@ -339,7 +372,7 @@ export const ECLEnterpriseForm = () => {
             type="text"
             id="numeroPlaque"
             name="numeroPlaque"
-            value={formData.numeroPlaque}
+            value={formData?.numeroPlaque}
             onChange={handleInputChange}
             className="mt-1 block w-full border-b border-pink-300 bg-transparent focus:border-pink-500 focus:ring-0"
           />
@@ -351,7 +384,7 @@ export const ECLEnterpriseForm = () => {
             type="text"
             id="signature"
             name="signature"
-            value={formData.signature}
+            value={formData?.signature}
             onChange={handleInputChange}
             className="mt-1 block w-full border-b-2 border-pink-300 bg-transparent focus:border-pink-500 focus:ring-0"
             placeholder="Tapez votre nom pour signer"
