@@ -7,17 +7,20 @@ import {
   useUser,
 } from '@clerk/nextjs'
 import React, { useEffect, useState } from 'react';
-import { FormDataProps, handleSubmitForm, MetadataProps, TimesheetEntry } from '@/store/slice/timesheetSlice';
+import { FormDataProps, handleSubmitForm, MetadataProps, selectEntryById, TimesheetEntry } from '@/store/slice/timesheetSlice';
+interface ECLEnterpriseFormProps {
+  documentId: string;
+}
 
-
-export const ECLEnterpriseForm = () => {
+export const ECLEnterpriseForm: React.FC<ECLEnterpriseFormProps> = ({ documentId }) => {
   const clerkUser: any = useUser()
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { 
     form 
   } = useAppSelector(state => state.form);
-  const [documentId, setDocumentId] = useState('');
+  const entry = useAppSelector(state => selectEntryById(state, documentId));
+  const [documentName, setDocumentName] = useState('Untitled Document');
   const [formData, setFormData] = useState<FormDataProps>({
     client: form?.client || '',
     workLocation: form?.workLocation || '',
@@ -37,13 +40,18 @@ export const ECLEnterpriseForm = () => {
     signature: form?.signature || '',
   });
   useEffect(() => {
+    if (entry) {
+      setFormData(entry);
+    }
+  }, [entry]);
+  useEffect(() => {
     // This effect will only run in the browser
     if (typeof window !== 'undefined') {
       const path = window.location.pathname;
       console.log('Path:', path);
       const parts = path.split('/');
       const id = parts[parts.length - 1];
-      setDocumentId(id);
+
     }
   }, []);
   useEffect(() => {
@@ -87,6 +95,9 @@ export const ECLEnterpriseForm = () => {
       dateEntries: [...prevData?.dateEntries, { date: '', startTime: '', endTime: '', hours: '' }]
     }));
   };
+  const handleDocumentNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setDocumentName(e.target.value);
+  };
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Form submitted:', formData);
@@ -113,7 +124,7 @@ export const ECLEnterpriseForm = () => {
         numeroPlaque: formData?.numeroPlaque,
         signature: formData?.signature,
         metadata: {
-          name: 'Document 3',
+          name: documentName,
           description: 'This is a description for document 3',
           createdBy: clerkUser.fullName,
           createdAt: new Date().toISOString(),
@@ -124,7 +135,7 @@ export const ECLEnterpriseForm = () => {
       }
       const resultAction = await dispatch(handleSubmitForm(timeSheet)).unwrap();
       console.log('Form submission successful:', resultAction);
-
+      router.push('/documents');
 
     } catch (error) {
       console.error('Failed to submit form:', error);
@@ -149,6 +160,7 @@ export const ECLEnterpriseForm = () => {
             <WatermarkTag />
         </div>
       <form onSubmit={handleSubmit} className="space-y-6">
+        
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label htmlFor="client" className="block text-sm font-medium text-pink-700">CLIENT</label>

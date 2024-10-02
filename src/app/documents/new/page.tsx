@@ -7,19 +7,24 @@ import { SignedIn, UserButton } from "@clerk/nextjs";
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { useEffect } from "react";
-
-const Document = async () => {
-    const clerkUser = await currentUser();
-    if(!clerkUser) redirect('/sign-in');
-    const documentTitle = "Test for Mario Romero";
-    return (
-        <div className="flex flex-col min-h-screen bg-gray-900 text-white">
-            <DocumentHeader documentTitle={documentTitle} />
-            <div className="flex flex-1">
-            <ECLEnterpriseForm />
-            </div>
-        </div>
-    )
-}
-
-export default Document
+interface DocumentProps {
+    params: { id: string };
+  }
+  
+  const Document = async ({ params }: DocumentProps) => {
+      const clerkUser = await currentUser();
+      if(!clerkUser) redirect('/sign-in');
+      
+      const documentId = params.id;
+  
+      return (
+          <div className="flex flex-col min-h-screen bg-gray-900 text-white">
+              <DocumentHeader documentId={documentId} />
+              <div className="flex flex-1">
+                  <ECLEnterpriseForm documentId={documentId} />
+              </div>
+          </div>
+      )
+  }
+  
+  export default Document;
