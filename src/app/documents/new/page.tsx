@@ -16,6 +16,7 @@ interface DocumentProps {
       if(!clerkUser) redirect('/sign-in');
       
       const documentId = params.id;
+      console.log("documentId : ",documentId );
   
       return (
           <div className="flex flex-col min-h-screen bg-gray-900 text-white">

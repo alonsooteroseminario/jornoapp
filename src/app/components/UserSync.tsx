@@ -20,6 +20,7 @@ const UserSync = () => {
             body: JSON.stringify({ userId: user.id }),
           });
           const userData = await response.json();
+          console.log('userData:', userData);
           dispatch(setUser(userData));
         } catch (error) {
           console.error('Error syncing user:', error);

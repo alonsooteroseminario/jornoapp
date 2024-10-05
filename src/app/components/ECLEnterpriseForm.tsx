@@ -7,7 +7,13 @@ import {
   useUser,
 } from '@clerk/nextjs'
 import React, { useEffect, useState } from 'react';
-import { FormDataProps, handleSubmitForm, MetadataProps, selectEntryById, TimesheetEntry } from '@/store/slice/timesheetSlice';
+import { 
+  FormDataProps, 
+  handleSubmitForm, 
+  MetadataProps, 
+  selectEntryById, 
+  TimesheetEntry 
+} from '@/store/slice/timesheetSlice';
 interface ECLEnterpriseFormProps {
   documentId: string;
 }
@@ -16,12 +22,24 @@ export const ECLEnterpriseForm: React.FC<ECLEnterpriseFormProps> = ({ documentId
   const clerkUser: any = useUser()
   const router = useRouter();
   const dispatch = useAppDispatch();
+  
   const { 
     form 
   } = useAppSelector(state => state.form);
+  const { 
+    id: clerkId,
+    email,
+    firstName,
+    lastName,
+    role,
+    profile
+  } = useAppSelector(state => state.user);
   const entry = useAppSelector(state => selectEntryById(state, documentId));
   const [documentName, setDocumentName] = useState('Untitled Document');
+  const [uniqueId, setUniqueId] = useState('');
   const [formData, setFormData] = useState<FormDataProps>({
+    id: '',
+    userId: clerkId,
     client: form?.client || '',
     workLocation: form?.workLocation || '',
     contractNumber: form?.contractNumber || '',
@@ -44,15 +62,60 @@ export const ECLEnterpriseForm: React.FC<ECLEnterpriseFormProps> = ({ documentId
       setFormData(entry);
     }
   }, [entry]);
-  useEffect(() => {
-    // This effect will only run in the browser
-    if (typeof window !== 'undefined') {
-      const path = window.location.pathname;
-      console.log('Path:', path);
-      const parts = path.split('/');
-      const id = parts[parts.length - 1];
 
-    }
+  useEffect(() => {
+    return () => {
+      if (typeof window !== 'undefined') {
+        const path = window.location.pathname;
+        console.log('Path:', path);
+        const parts = path.split('/');
+        const id = parts[parts.length - 1];
+        console.log('id: ', id);
+  
+        // if path is /new, then we are creating a new document
+        if (id === 'new') {
+          console.log('Creating a new document');
+  
+          // submit timesheet with name untitle and empty fields
+          const timeSheet: TimesheetEntry = {
+            id: documentId,
+            userId: clerkId,
+            client: formData?.client,
+            workLocation: formData?.workLocation,
+            contractNumber: formData?.contractNumber,
+            dateEntries: formData?.dateEntries,
+            totalHeuresSimple: formData?.totalHeuresSimple,
+            totalHeuresDouble: formData?.totalHeuresDouble,
+            totalVoyageSimple: formData?.totalVoyageSimple,
+            totalVoyageDouble: formData?.totalVoyageDouble,
+            materialTransported: formData?.materialTransported,
+            autresPrecisions: formData?.autresPrecisions,
+            ejesCamion: formData?.ejesCamion,
+            numeroCamion: formData?.numeroCamion,
+            transporteur: formData?.transporteur,
+            nomChauffeur: formData?.nomChauffeur,
+            numeroPlaque: formData?.numeroPlaque,
+            signature: formData?.signature,
+            metadata: {
+              name: documentName,
+              description: '',
+              createdBy: clerkUser.fullName,
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+              status: 'Draft',
+              statusUpdatedAt: new Date().toISOString(),
+            },
+          }
+          const resultAction = dispatch(handleSubmitForm(timeSheet)).unwrap();
+          console.log('Created timesheet succesfull:', resultAction);
+        } else {
+          console.log('Fetching document:', id);
+          setUniqueId(id);
+        }
+  
+      }
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   useEffect(() => {
     if(!clerkUser) {
@@ -61,15 +124,13 @@ export const ECLEnterpriseForm: React.FC<ECLEnterpriseFormProps> = ({ documentId
     }
   }, [clerkUser, router]);
   useEffect(() => {
-    console.log('Form data:', formData);
     dispatch(SET_FORM_DATA(formData));
-
   }, [dispatch, formData]);
   useEffect(() => {
-    if(documentId !==``) {
-        console.log('Document ID:', documentId);
+    if(uniqueId !==``) {
+        console.log('uniqueId:', uniqueId);
     }
-  }, [documentId]);
+  }, [uniqueId]);
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prevData : any) => ({
@@ -144,7 +205,7 @@ export const ECLEnterpriseForm: React.FC<ECLEnterpriseFormProps> = ({ documentId
   };
   const WatermarkTag = () => (
     <div className="">
-      <p className="text-[9px] text-pink-600 font-semibold">Unique ID: {documentId}</p>
+      <p className="text-[9px] text-pink-600 font-semibold">Unique ID: {uniqueId}</p>
     </div>
   );
   return (

@@ -12,6 +12,8 @@ export interface DateEntry {
   hours: string;
 }
 export interface FormDataProps {
+  id: string;
+  userId: string;
   client: string;
   workLocation: string;
   contractNumber: string;
@@ -155,6 +157,7 @@ export const timesheetSlice = createSlice({
       state.loading = false;
       state.error = null;
       //  get the confirmation from the backend and update the state
+      console.log('handleSubmitForm.fulfilled Entry created:', action.payload);
     });
     builder.addCase(handleSubmitForm.rejected, (state, action) => {
       state.loading = false;

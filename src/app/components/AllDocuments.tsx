@@ -72,7 +72,7 @@ export const AllDocuments = () => {
                     </ul>
                 ) : (
                     <div className="text-center py-8">
-                        <h3 className="text-xl font-semibold">No documents found</h3>
+                        <h3 className="text-xl font-semibold text-gray-300">No documents found</h3>
                     </div>
                 )}
             </div>

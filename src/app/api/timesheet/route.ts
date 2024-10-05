@@ -6,13 +6,13 @@ export async function POST(req: NextRequest) {
     const data = await req.json();
     // Remove the 'id' field from the incoming data
     const { id, metadata, userId, ...timesheetData } = data;
-
     const currentDate = new Date().toISOString();
 
     const entry = await prisma.timesheetEntry.create({
       data: {
         ...timesheetData,
-        userId: userId || undefined,
+        id: id,
+        userId: userId,
         metadata: {
           name: metadata?.name || '',
           description: metadata?.description || '',
