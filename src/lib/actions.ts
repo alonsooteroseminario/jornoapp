@@ -12,9 +12,7 @@ export async function getEntriesTimeSheetDB() {
 
 export async function createEntryTimeSheetDB(data: TimesheetEntry) {
     try {
-        console.log('createEntryTimeSheetDB data:', data);
         const response = await axios.post('/api/timesheet', data);
-        console.log('createEntryTimeSheetDB response:', response);
         return response;
     } catch (error: any) {
         throw new Error(error.message);

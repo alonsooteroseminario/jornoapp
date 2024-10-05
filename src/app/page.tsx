@@ -12,6 +12,8 @@ const Home = async () => {
   const clerkUser = await currentUser();
   if(!clerkUser) redirect('/sign-in');
 
+  console.log("clerkUser: ",clerkUser);
+
   return (
     <div className="min-h-screen bg-gray-900 text-white">
       <Header className="sticky top-0 bg-gray-800 z-10 p-4">
