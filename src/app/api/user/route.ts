@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { clerkClient } from '@clerk/nextjs/server';
 
-
 export async function POST(req: NextRequest) {
   try {
     const { userId } = await req.json();
@@ -15,7 +14,10 @@ export async function POST(req: NextRequest) {
     const clerkUser = await clerkClient.users.getUser(userId);
 
     // Check if user exists in our database
-    let user = await prisma.user.findUnique({ where: { email: clerkUser.emailAddresses[0].emailAddress } });
+    let user = await prisma.user.findUnique({ 
+      where: { email: clerkUser.emailAddresses[0].emailAddress },
+      include: { profile: true }
+    });
 
     if (user) {
       // Update existing user
@@ -24,18 +26,33 @@ export async function POST(req: NextRequest) {
         data: {
           firstName: clerkUser.firstName,
           lastName: clerkUser.lastName,
-          // Add any other fields you want to update
+          profile: {
+            update: {
+              // Update profile fields as needed
+            }
+          }
         },
+        include: { profile: true }
       });
     } else {
-      // Create new user
+      // Check if this is the first user
+      const userCount = await prisma.user.count();
+      const isFirstUser = userCount === 0;
+
+      // Create new user with profile
       user = await prisma.user.create({
         data: {
           email: clerkUser.emailAddresses[0].emailAddress,
           firstName: clerkUser.firstName,
           lastName: clerkUser.lastName,
-          // Add any other fields you want to set for new users
+          role: isFirstUser ? 'ADMIN' : 'USER', // Set first user as ADMIN
+          profile: {
+            create: {
+              // Initialize profile fields as needed
+            }
+          }
         },
+        include: { profile: true }
       });
     }
 

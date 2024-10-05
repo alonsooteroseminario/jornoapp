@@ -135,7 +135,7 @@ export const ECLEnterpriseForm: React.FC<ECLEnterpriseFormProps> = ({ documentId
       }
       const resultAction = await dispatch(handleSubmitForm(timeSheet)).unwrap();
       console.log('Form submission successful:', resultAction);
-      router.push('/documents');
+      router.push('/dashboard');
 
     } catch (error) {
       console.error('Failed to submit form:', error);

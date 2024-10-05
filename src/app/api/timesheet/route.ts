@@ -37,6 +37,9 @@ export async function GET() {
       include: {
         user: true,
       },
+      // where: {
+      //   userId: { not: null } // Only fetch entries with non-null userId
+      // }
     });
 
     // Ensure all metadata fields are present, even if null

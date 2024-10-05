@@ -1,57 +1,35 @@
 'use client';
 
-import { useUser, SignedIn } from '@clerk/nextjs';
-import { useRouter } from 'next/navigation';
+import { useUser } from '@clerk/nextjs';
 import { useEffect } from 'react';
-import axios from 'axios';
+import { useAppDispatch } from '@/store/hooks';
+import { setUser } from '@/store/slice/userSlice';
 
-const syncUser = async (userId: string) => {
-  try {
-    const response = await axios.post('/api/user', { userId }, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
-    return response.data;
-  } catch (error) {
-    if (axios.isAxiosError(error)) {
-      console.error('Error syncing user:', error.response?.data || error.message);
-      throw new Error(error.response?.data?.error || 'Failed to sync user');
-    } else {
-      console.error('Unexpected error:', error);
-      throw new Error('An unexpected error occurred');
-    }
-  }
-};
 
 const UserSync = () => {
-  const { isLoaded, user } = useUser();
-  const router = useRouter();
+  const { user } = useUser();
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
-    const handleSync = async () => {
-      if (isLoaded && user) {
+    const syncUser = async () => {
+      if (user) {
         try {
-          await syncUser(user.id);
-          router.push('/dashboard'); // Redirect to dashboard or home page
+          const response = await fetch('/api/user', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId: user.id }),
+          });
+          const userData = await response.json();
+          dispatch(setUser(userData));
         } catch (error) {
-          console.error('Failed to sync user:', error);
-          // Handle the error (e.g., show an error message to the user)
+          console.error('Error syncing user:', error);
         }
       }
     };
-
-    handleSync();
-  }, [isLoaded, user, router]);
+    syncUser();
+  }, [user, dispatch]);
 
   return null; // This component doesn't render anything
 };
 
-const UserSyncWrapper = () => (
-  <SignedIn>
-    <UserSync />
-  </SignedIn>
-);
-
-export default UserSyncWrapper;
+export default UserSync;
