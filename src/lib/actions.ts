@@ -1,3 +1,4 @@
+import { ShareTimesheetEntry } from "@/lib/types";
 import { TimesheetEntry } from "@/store/slice/timesheetSlice";
 import axios from "axios";
 
@@ -36,3 +37,13 @@ export async function deleteEntryTimeSheetDB(id: string) {
       throw new Error(error.message);
     }
   }
+
+
+  // export async function shareTimesheetEntry({timesheetId, emailToShare}:ShareTimesheetEntry) {
+  //   try {
+  //     const response = await axios.put('/api/timesheet/share', { timesheetId, emailToShare });
+  //     return response;
+  //   } catch (error: any) {
+  //     throw new Error(error.message);
+  //   }
+  // }

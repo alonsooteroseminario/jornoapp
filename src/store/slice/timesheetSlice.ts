@@ -6,6 +6,8 @@ import {
   getEntriesTimeSheetDB, 
   updateEntryTimeSheetDB
 } from '@/lib/actions';
+import { ShareTimesheetEntry } from '@/lib/types';
+import axios from 'axios';
 export interface DateEntry {
   date: string;
   startTime: string;
@@ -108,7 +110,7 @@ export const handleSubmitForm = createAsyncThunk(
   }
 );
 export const deleteEntry = createAsyncThunk(
-  'timesheet/deleteEntry',
+  'deleteEntry',
   async (id: string, thunkAPI) => {
     try {
       await deleteEntryTimeSheetDB(id);
@@ -120,7 +122,7 @@ export const deleteEntry = createAsyncThunk(
 );
 
 export const updateTimesheetEntry = createAsyncThunk(
-  'timesheet/updateEntry',
+  'updateTimesheetEntry',
   async (data: Partial<TimesheetEntry>, thunkAPI) => {
     try {
       const response = await updateEntryTimeSheetDB(data);
@@ -131,20 +133,17 @@ export const updateTimesheetEntry = createAsyncThunk(
   }
 );
 
+
 export const shareTimesheetEntry = createAsyncThunk(
   'timesheet/shareEntry',
-  async ({ timesheetId, emailToShare }: { timesheetId: string, emailToShare: string }, thunkAPI) => {
+  async ({ timesheetId, emailToShare }: ShareTimesheetEntry, thunkAPI) => {
     try {
-      const response = await fetch('/api/timesheet/share', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ timesheetId, emailToShare }),
-      });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error);
-      return data;
+      const response = await axios.put('/api/timesheet/share', { timesheetId, emailToShare });
+      console.log('shareTimesheetEntry response:', response.data);
+      return response.data;
     } catch (error: any) {
-      return thunkAPI.rejectWithValue(error.message);
+      console.error('Error in shareTimesheetEntry:', error.response?.data || error.message);
+      return thunkAPI.rejectWithValue(error.response?.data || error.message);
     }
   }
 );
@@ -256,10 +255,11 @@ export const timesheetSlice = createSlice({
     })
     .addCase(shareTimesheetEntry.fulfilled, (state, action) => {
       state.loading = false;
-      const index = state.entries.findIndex(entry => entry.id === action.payload.id);
+      const index = state.entries?.findIndex(entry => entry.id === action.payload?.id);
       if (index !== -1) {
         state.entries[index] = action.payload;
       }
+      console.log('Entry shared:', action.payload);
     })
     .addCase(shareTimesheetEntry.rejected, (state, action) => {
       state.loading = false;

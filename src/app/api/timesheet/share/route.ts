@@ -1,38 +1,35 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 
-export async function POST(req: NextRequest) {
+export async function PUT(req: NextRequest) {
   try {
     const { timesheetId, emailToShare } = await req.json();
+    console.log('Received request:', { timesheetId, emailToShare });
 
     if (!timesheetId || !emailToShare) {
+      console.log('Bad request: Missing timesheetId or emailToShare');
       return NextResponse.json({ error: 'Timesheet ID and email are required' }, { status: 400 });
     }
 
-    // Check if the timesheet exists
     const timesheet = await prisma.timesheetEntry.findUnique({
       where: { id: timesheetId },
     });
 
     if (!timesheet) {
+      console.log('Timesheet not found:', timesheetId);
       return NextResponse.json({ error: 'Timesheet not found' }, { status: 404 });
     }
 
-    // Check if the email is already in the sharedWithEmails array
-    if (timesheet.sharedWithEmails && timesheet.sharedWithEmails.includes(emailToShare)) {
-      return NextResponse.json({ error: 'Timesheet already shared with this email' }, { status: 400 });
-    }
-
-    // Update the timesheet
     const updatedTimesheet = await prisma.timesheetEntry.update({
       where: { id: timesheetId },
       data: {
         sharedWithEmails: {
           push: emailToShare
         }
-      }
+      },
     });
 
+    console.log('Timesheet updated successfully:', updatedTimesheet.id);
     return NextResponse.json(updatedTimesheet);
   } catch (error) {
     console.error('Error sharing timesheet:', error);
