@@ -1,25 +1,26 @@
-// File: app/api/timesheet/route.ts
-
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 
 export async function POST(req: NextRequest) {
   try {
     const data = await req.json();
+    // Remove the 'id' field from the incoming data
     const { id, metadata, userId, ...timesheetData } = data;
+    const currentDate = new Date().toISOString();
 
     const entry = await prisma.timesheetEntry.create({
       data: {
         ...timesheetData,
-        userId: userId || undefined,
+        id: id,
+        userId: userId,
         metadata: {
-          name: metadata.name,
-          description: metadata.description,
-          status: metadata.status,
-          statusUpdatedAt: new Date().toISOString(),
+          name: metadata?.name || '',
+          description: metadata?.description || '',
+          createdAt: currentDate,
+          updatedAt: currentDate,
+          status: metadata?.status || 'Draft',
+          statusUpdatedAt: currentDate,
         },
-        createdAt: new Date(),
-        updatedAt: new Date(),
       },
     });
 
@@ -36,12 +37,22 @@ export async function GET() {
       include: {
         user: true,
       },
+      // where: {
+      //   userId: { not: null } // Only fetch entries with non-null userId
+      // }
     });
 
+    // Ensure all metadata fields are present, even if null
     const sanitizedEntries = entries.map(entry => ({
       ...entry,
-      createdAt: entry.createdAt ? entry.createdAt.toISOString() : null,
-      updatedAt: entry.updatedAt ? entry.updatedAt.toISOString() : null,
+      metadata: {
+        name: entry.metadata?.name || null,
+        description: entry.metadata?.description || null,
+        createdAt: entry.metadata?.createdAt || null,
+        updatedAt: entry.metadata?.updatedAt || null,
+        status: entry.metadata?.status || null,
+        statusUpdatedAt: entry.metadata?.statusUpdatedAt || null,
+      }
     }));
 
     return NextResponse.json(sanitizedEntries);

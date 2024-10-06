@@ -6,19 +6,47 @@ import { useRouter } from 'next/navigation';
 import { 
   useUser,
 } from '@clerk/nextjs'
-import React, { useEffect, useState } from 'react';
-import { FormDataProps, handleSubmitForm, MetadataProps, TimesheetEntry } from '@/store/slice/timesheetSlice';
+import React, { useEffect, useRef, useState } from 'react';
+import { 
+  FormDataProps, 
+  handleSubmitForm, 
+  MetadataProps, 
+  selectEntryById, 
+  TimesheetEntry, 
+  updateTimesheetEntry
+} from '@/store/slice/timesheetSlice';
+import { fixInvalidObjectId } from '@/lib/utils';
+import toast from 'react-hot-toast';
+interface ECLEnterpriseFormProps {
+  documentId: string;
+}
 
-
-export const ECLEnterpriseForm = () => {
+export const ECLEnterpriseForm: React.FC<ECLEnterpriseFormProps> = ({ documentId }) => {
   const clerkUser: any = useUser()
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { 
     form 
   } = useAppSelector(state => state.form);
-  const [documentId, setDocumentId] = useState('');
+  const { 
+    entries,
+    loading,
+    error,
+    createdId
+  } = useAppSelector(state => state.timesheet);
+  const { 
+    id: clerkId,
+    email,
+    firstName,
+    lastName,
+    role,
+    profile
+  } = useAppSelector(state => state.user);
+  const [documentName, setDocumentName] = useState('Untitled Document');
+  const [uniqueId, setUniqueId] = useState('');
   const [formData, setFormData] = useState<FormDataProps>({
+    id: fixInvalidObjectId(documentId),
+    userId: clerkId,
     client: form?.client || '',
     workLocation: form?.workLocation || '',
     contractNumber: form?.contractNumber || '',
@@ -36,16 +64,74 @@ export const ECLEnterpriseForm = () => {
     numeroPlaque: form?.numeroPlaque || '',
     signature: form?.signature || '',
   });
+  const effectRan = useRef(false);
   useEffect(() => {
-    // This effect will only run in the browser
-    if (typeof window !== 'undefined') {
-      const path = window.location.pathname;
-      console.log('Path:', path);
-      const parts = path.split('/');
-      const id = parts[parts.length - 1];
-      setDocumentId(id);
+    if (effectRan.current) return;
+    const handleInitialLoad = async () => {
+      if (typeof window !== 'undefined') {
+        const path = window.location.pathname;
+        console.log('Path:', path);
+        const parts = path.split('/');
+        const id = parts[parts.length - 1];
+        console.log('id: ', id);
+
+        if (id === 'new' && !loading) {
+          console.log('Creating a new document');
+          // submit timesheet with name untitle and empty fields
+          const timeSheet: TimesheetEntry = {
+            // id: fixInvalidObjectId(documentId),
+            userId: clerkId,
+            client: formData?.client,
+            workLocation: formData?.workLocation,
+            contractNumber: formData?.contractNumber,
+            dateEntries: formData?.dateEntries,
+            totalHeuresSimple: formData?.totalHeuresSimple,
+            totalHeuresDouble: formData?.totalHeuresDouble,
+            totalVoyageSimple: formData?.totalVoyageSimple,
+            totalVoyageDouble: formData?.totalVoyageDouble,
+            materialTransported: formData?.materialTransported,
+            autresPrecisions: formData?.autresPrecisions,
+            ejesCamion: formData?.ejesCamion,
+            numeroCamion: formData?.numeroCamion,
+            transporteur: formData?.transporteur,
+            nomChauffeur: formData?.nomChauffeur,
+            numeroPlaque: formData?.numeroPlaque,
+            signature: formData?.signature,
+            metadata: {
+              name: documentName,
+              description: '',
+              createdBy: clerkUser.fullName,
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+              status: 'Draft',
+              statusUpdatedAt: new Date().toISOString(),
+            },
+          }
+          const resultAction: any = dispatch(handleSubmitForm(timeSheet)).unwrap();
+          console.log('Created timesheet succesfull:', resultAction);
+
+        } else {
+          console.log('Fetching document:', id);
+
+        }
+      }
+    };
+    handleInitialLoad();
+    effectRan.current = true;
+    return () => {
+      console.log('Cleanup');
+      // Add any cleanup logic here if needed
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, documentId, clerkId]);
+  
+  // loading
+  useEffect(() => {
+    if (createdId.created) {
+      setUniqueId(createdId.value);
     }
-  }, []);
+  }, [createdId]);
+
   useEffect(() => {
     if(!clerkUser) {
       console.log('No user found', clerkUser);
@@ -53,15 +139,14 @@ export const ECLEnterpriseForm = () => {
     }
   }, [clerkUser, router]);
   useEffect(() => {
-    console.log('Form data:', formData);
     dispatch(SET_FORM_DATA(formData));
-
   }, [dispatch, formData]);
   useEffect(() => {
-    if(documentId !==``) {
-        console.log('Document ID:', documentId);
+    if(uniqueId !==``) {
+        console.log('uniqueId:', uniqueId);
+        router.push(`/documents/${uniqueId}`);
     }
-  }, [documentId]);
+  }, [router, uniqueId]);
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prevData : any) => ({
@@ -87,14 +172,15 @@ export const ECLEnterpriseForm = () => {
       dateEntries: [...prevData?.dateEntries, { date: '', startTime: '', endTime: '', hours: '' }]
     }));
   };
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (e?: React.FormEvent) => {
+    if (e && e.preventDefault) {
+      e.preventDefault();
+    }
     console.log('Form submitted:', formData);
 
     try {
-      // Dispatch the handleSubmitForm action
-      const timeSheet: TimesheetEntry = {
-        id: documentId,
+      const timesheetData: Partial<TimesheetEntry> = {
+        id: uniqueId,
         userId: clerkUser.id,
         client: formData?.client,
         workLocation: formData?.workLocation,
@@ -113,27 +199,33 @@ export const ECLEnterpriseForm = () => {
         numeroPlaque: formData?.numeroPlaque,
         signature: formData?.signature,
         metadata: {
-          name: 'Document 3',
-          description: 'This is a description for document 3',
-          createdBy: clerkUser.fullName,
-          createdAt: new Date().toISOString(),
+          name: documentName,
+          description: '',
           updatedAt: new Date().toISOString(),
-          status: 'Draft',
+          status: 'Updated',
           statusUpdatedAt: new Date().toISOString(),
         },
+      };
+
+      if (uniqueId) {
+        const resultAction = await dispatch(updateTimesheetEntry({
+          id: uniqueId,
+          ...timesheetData
+        })).unwrap();
+        console.log('Timesheet update successful:', resultAction);
       }
-      const resultAction = await dispatch(handleSubmitForm(timeSheet)).unwrap();
-      console.log('Form submission successful:', resultAction);
+
+      router.push('/documents');
 
 
     } catch (error) {
-      console.error('Failed to submit form:', error);
-      // Handle the error (e.g., show an error message to the user)
+      console.error('Failed to submit timesheet:', error);
+      toast.error('Failed to submit timesheet. Please try again.');
     }
   };
   const WatermarkTag = () => (
     <div className="">
-      <p className="text-[9px] text-pink-600 font-semibold">Unique ID: {documentId}</p>
+      <p className="text-[9px] text-pink-600 font-semibold">Unique ID: {uniqueId}</p>
     </div>
   );
   return (
@@ -149,6 +241,7 @@ export const ECLEnterpriseForm = () => {
             <WatermarkTag />
         </div>
       <form onSubmit={handleSubmit} className="space-y-6">
+        
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label htmlFor="client" className="block text-sm font-medium text-pink-700">CLIENT</label>

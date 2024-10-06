@@ -12,11 +12,27 @@ export async function getEntriesTimeSheetDB() {
 
 export async function createEntryTimeSheetDB(data: TimesheetEntry) {
     try {
-        console.log('createEntryTimeSheetDB data:', data);
         const response = await axios.post('/api/timesheet', data);
-        console.log('createEntryTimeSheetDB response:', response);
         return response;
     } catch (error: any) {
         throw new Error(error.message);
     }
 }
+
+export async function deleteEntryTimeSheetDB(id: string) {
+    try {
+      const response = await axios.delete(`/api/timesheet/${id}`);
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.message);
+    }
+  }
+
+  export async function updateEntryTimeSheetDB(data: Partial<TimesheetEntry>) {
+    try {
+      const response = await axios.put(`/api/timesheet/${data.id}`, data);
+      return response;
+    } catch (error: any) {
+      throw new Error(error.message);
+    }
+  }

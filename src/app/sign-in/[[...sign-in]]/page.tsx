@@ -1,13 +1,13 @@
-import UserSync from '@/app/components/UserSync';
 import { SignIn } from '@clerk/nextjs';
-
 
 const SignInPage = () => {
   return (
-    <main className="auth-page">
-      <SignIn />
-      <UserSync />
-    </main>
+    <div className="min-h-screen flex flex-col">
+
+      <main className="flex-grow flex items-center justify-center">
+        <SignIn />
+      </main>
+    </div>
   );
 };
 

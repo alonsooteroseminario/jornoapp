@@ -4,6 +4,7 @@ import "./globals.css";
 import ReduxProvider from "../store/ReduxProvider";
 import { ClerkProvider } from "@clerk/nextjs";
 import { dark } from "@clerk/themes"
+import UserSync from "@/app/components/UserSync";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -40,7 +41,10 @@ export default function RootLayout({
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white text-black`}
         >
-          <ReduxProvider>{children}</ReduxProvider>
+          <ReduxProvider>
+            <UserSync />
+            {children}
+          </ReduxProvider>
         </body>
       </html>
     </ClerkProvider>
