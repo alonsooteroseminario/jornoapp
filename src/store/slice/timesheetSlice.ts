@@ -52,6 +52,7 @@ export interface TimesheetEntry {
   numeroPlaque?: string;
   signature?: string;
   metadata: MetadataProps;
+  sharedWithEmails: string[];
 }
 export interface MetadataProps {
   name?: string;
@@ -64,6 +65,7 @@ export interface MetadataProps {
 }
 export interface TimesheetState {
   entries: TimesheetEntry[];
+  sharedEntries: TimesheetEntry[];
   loading: boolean;
   error: string | null;
   createdId: {
@@ -73,6 +75,7 @@ export interface TimesheetState {
 }
 export const initialState: TimesheetState = {
   entries:[],
+  sharedEntries: [],
   loading: false,
   error: null,
   createdId: {
@@ -127,6 +130,8 @@ export const updateTimesheetEntry = createAsyncThunk(
     }
   }
 );
+
+
 
 
 export const timesheetSlice = createSlice({
@@ -211,6 +216,7 @@ export const timesheetSlice = createSlice({
       state.error = null;
       console.log('Entries fetched:', action.payload);
       state.entries = action.payload;
+      // state.sharedEntries = action.payload.filter((entry: TimesheetEntry) => entry.sharedWithEmails);
     });
     builder.addCase(getEntries.rejected, (state, action) => {
       state.loading = false;
@@ -242,6 +248,7 @@ export const {
 
 // Selectors
 export const selectAllEntries = (state: RootState) => state.timesheet.entries;
+export const selectSharedEntries = (state: RootState) => state.timesheet.sharedEntries;
 export const selectEntryById = (state: RootState, id: string) => state.timesheet.entries.find(entry => entry.id === id);
 export const selectLoading = (state: RootState) => state.timesheet.loading;
 export const selectError = (state: RootState) => state.timesheet.error;

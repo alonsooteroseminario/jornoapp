@@ -31,18 +31,25 @@ export async function POST(req: NextRequest) {
   }
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
+    const userEmail = req.headers.get('user-email');
+    if (!userEmail) {
+      return NextResponse.json({ error: 'User email is required' }, { status: 400 });
+    }
+
     const entries = await prisma.timesheetEntry.findMany({
+      where: {
+        OR: [
+          { user: { email: userEmail } },
+          { sharedWithEmails: { has: userEmail } }
+        ]
+      },
       include: {
         user: true,
       },
-      // where: {
-      //   userId: { not: null } // Only fetch entries with non-null userId
-      // }
     });
 
-    // Ensure all metadata fields are present, even if null
     const sanitizedEntries = entries.map(entry => ({
       ...entry,
       metadata: {

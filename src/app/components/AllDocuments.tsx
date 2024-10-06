@@ -30,7 +30,7 @@ export const AllDocuments = () => {
           });
     }, [dispatch]);
     const user = useAppSelector(selectUser);
-    const handleDelete = async (id: string) => {
+    const handleDelete = async (id: string | any) => {
       if (window.confirm('Are you sure you want to delete this document?')) {
         try {
           await dispatch(deleteEntry(id)).unwrap();
@@ -65,12 +65,12 @@ export const AllDocuments = () => {
                         {entries.map((entry: TimesheetEntry) => {
                           return ( (entry.userId === user.id) &&
                             <DocumentListItem
-                                  key={entry.id}
-                                  id={entry.id}
-                                  name={entry.metadata?.name || 'Untitled'}
-                                  createdAt={dateConverter(entry.metadata?.createdAt || '')}
+                                  key={entry?.id}
+                                  id={entry?.id}
+                                  name={entry?.metadata?.name || 'Untitled'}
+                                  createdAt={dateConverter(entry?.metadata?.createdAt || '')}
                                   onDelete={()=>{
-                                    handleDelete(entry.id)
+                                    handleDelete(entry?.id)
                                   }}
                               />
                             )
@@ -82,6 +82,7 @@ export const AllDocuments = () => {
                     </div>
                 )}
             </div>
+
           </div>
         )}
       </main>

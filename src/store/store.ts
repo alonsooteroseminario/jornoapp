@@ -2,9 +2,11 @@ import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit'
 import timesheetReducer from './slice/timesheetSlice'
 import formSlice from '@/store/slice/formSlice'
 import userReducer from './slice/userSlice'
+import popupReducer from './slice/popupSlice';
 
 export const store = configureStore({
   reducer: {
+    popup: popupReducer,
     user: userReducer,
     timesheet: timesheetReducer,
     form: formSlice

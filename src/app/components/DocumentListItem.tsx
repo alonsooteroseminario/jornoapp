@@ -4,9 +4,9 @@ import Link from 'next/link';
 import { FiFileText, FiTrash2 } from 'react-icons/fi';
 
 interface DocumentListItemProps {
-  id: string;
-  name: string;
-  createdAt: string;
+  id: string | any
+  name: string | any;
+  createdAt: string | any;
   onDelete: (id: string) => void;
 }
 
