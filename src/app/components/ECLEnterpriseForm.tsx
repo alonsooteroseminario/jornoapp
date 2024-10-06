@@ -14,6 +14,7 @@ import {
   selectEntryById, 
   TimesheetEntry 
 } from '@/store/slice/timesheetSlice';
+import { fixInvalidObjectId } from '@/lib/utils';
 interface ECLEnterpriseFormProps {
   documentId: string;
 }
@@ -34,11 +35,11 @@ export const ECLEnterpriseForm: React.FC<ECLEnterpriseFormProps> = ({ documentId
     role,
     profile
   } = useAppSelector(state => state.user);
-  const entry = useAppSelector(state => selectEntryById(state, documentId));
+
   const [documentName, setDocumentName] = useState('Untitled Document');
   const [uniqueId, setUniqueId] = useState('');
   const [formData, setFormData] = useState<FormDataProps>({
-    id: '',
+    id: fixInvalidObjectId(documentId),
     userId: clerkId,
     client: form?.client || '',
     workLocation: form?.workLocation || '',
@@ -57,11 +58,7 @@ export const ECLEnterpriseForm: React.FC<ECLEnterpriseFormProps> = ({ documentId
     numeroPlaque: form?.numeroPlaque || '',
     signature: form?.signature || '',
   });
-  useEffect(() => {
-    if (entry) {
-      setFormData(entry);
-    }
-  }, [entry]);
+
 
   useEffect(() => {
     return () => {
@@ -78,7 +75,7 @@ export const ECLEnterpriseForm: React.FC<ECLEnterpriseFormProps> = ({ documentId
   
           // submit timesheet with name untitle and empty fields
           const timeSheet: TimesheetEntry = {
-            id: documentId,
+            id: fixInvalidObjectId(documentId),
             userId: clerkId,
             client: formData?.client,
             workLocation: formData?.workLocation,
@@ -156,9 +153,6 @@ export const ECLEnterpriseForm: React.FC<ECLEnterpriseFormProps> = ({ documentId
       dateEntries: [...prevData?.dateEntries, { date: '', startTime: '', endTime: '', hours: '' }]
     }));
   };
-  const handleDocumentNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setDocumentName(e.target.value);
-  };
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Form submitted:', formData);
@@ -186,7 +180,7 @@ export const ECLEnterpriseForm: React.FC<ECLEnterpriseFormProps> = ({ documentId
         signature: formData?.signature,
         metadata: {
           name: documentName,
-          description: 'This is a description for document 3',
+          description: '',
           createdBy: clerkUser.fullName,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
@@ -196,7 +190,7 @@ export const ECLEnterpriseForm: React.FC<ECLEnterpriseFormProps> = ({ documentId
       }
       const resultAction = await dispatch(handleSubmitForm(timeSheet)).unwrap();
       console.log('Form submission successful:', resultAction);
-      router.push('/dashboard');
+      router.push('/documents');
 
     } catch (error) {
       console.error('Failed to submit form:', error);

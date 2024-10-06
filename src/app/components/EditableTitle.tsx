@@ -6,25 +6,22 @@ import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { SET_DOCUMENT_NAME, selectEntryById } from '@/store/slice/timesheetSlice';
 
 interface EditableTitleProps {
-  documentId: string;
+
 }
 
-const EditableTitle: React.FC<EditableTitleProps> = ({ documentId }) => {
+const EditableTitle: React.FC<EditableTitleProps> = () => {
   const dispatch = useAppDispatch();
-  const entry = useAppSelector(state => selectEntryById(state, documentId));
   const [isEditing, setIsEditing] = useState(false);
-  const [title, setTitle] = useState(entry?.metadata.name || 'Untitled Document');
+  const [title, setTitle] = useState('Untitled Document');
 
-  useEffect(() => {
-    setTitle(entry?.metadata.name || 'Untitled Document');
-  }, [entry]);
+
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTitle(e.target.value);
   };
 
   const handleTitleSubmit = () => {
-    dispatch(SET_DOCUMENT_NAME({ id: documentId, name: title }));
+    dispatch(SET_DOCUMENT_NAME({ id: '', name: title }));
     setIsEditing(false);
   };
 

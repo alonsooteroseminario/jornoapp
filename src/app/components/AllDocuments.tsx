@@ -3,7 +3,11 @@
 import DocumentListItem from "@/app/components/DocumentListItem"
 import { dateConverter } from "@/lib/utils"
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { deleteEntry, getEntries, TimesheetEntry } from "@/store/slice/timesheetSlice";
+import { 
+  deleteEntry, 
+  getEntries, 
+  TimesheetEntry 
+} from "@/store/slice/timesheetSlice";
 import { selectUser } from "@/store/slice/userSlice";
 import Link from "next/link"
 import { useEffect } from "react";
@@ -58,17 +62,19 @@ export const AllDocuments = () => {
                 </div>
                 {entries.length > 0 ? (
                     <ul className="space-y-4">
-                        {entries.map((entry: TimesheetEntry) => (
+                        {entries.map((entry: TimesheetEntry) => {
+                          return ( (entry.userId === user.id) &&
                             <DocumentListItem
-                                key={entry.id}
-                                id={entry.id}
-                                name={entry.metadata?.name || 'Untitled'}
-                                createdAt={dateConverter(entry.metadata?.createdAt || '')}
-                                onDelete={()=>{
-                                  handleDelete(entry.id)
-                                }}
-                            />
-                        ))}
+                                  key={entry.id}
+                                  id={entry.id}
+                                  name={entry.metadata?.name || 'Untitled'}
+                                  createdAt={dateConverter(entry.metadata?.createdAt || '')}
+                                  onDelete={()=>{
+                                    handleDelete(entry.id)
+                                  }}
+                              />
+                            )
+                      })}
                     </ul>
                 ) : (
                     <div className="text-center py-8">

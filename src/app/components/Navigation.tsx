@@ -19,7 +19,7 @@ const Navigation: React.FC = () => {
           <Link href="/documents/new" className="hover:text-blue-200 transition-colors">
             Create Timesheet
           </Link>
-          <Link href="/dashboard" className="hover:text-blue-200 transition-colors">
+          <Link href="/documents" className="hover:text-blue-200 transition-colors">
             Documents
           </Link>
           {user.role === 'ADMIN' && (
