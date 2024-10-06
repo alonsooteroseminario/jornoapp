@@ -138,7 +138,7 @@ export const shareTimesheetEntry = createAsyncThunk(
   'timesheet/shareEntry',
   async ({ timesheetId, emailToShare }: ShareTimesheetEntry, thunkAPI) => {
     try {
-      const response = await axios.put('/api/timesheet/share', { timesheetId, emailToShare });
+      const response = await axios.post('/api/timesheet/share', { timesheetId, emailToShare });
       console.log('shareTimesheetEntry response:', response.data);
       return response.data;
     } catch (error: any) {

@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 
-export async function PUT(req: NextRequest) {
+// src/app/api/timesheet/share/route.ts
+export async function POST(req: NextRequest) {
   try {
     const { timesheetId, emailToShare } = await req.json();
     console.log('Received request:', { timesheetId, emailToShare });
