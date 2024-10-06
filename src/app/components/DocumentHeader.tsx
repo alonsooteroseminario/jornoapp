@@ -13,10 +13,10 @@ const DocumentHeader: React.FC<DocumentHeaderProps> = () => {
     <header className="bg-gray-800 p-4">
       <div className="container mx-auto flex justify-between items-center">
         <div className="flex items-center space-x-4">
-          <Link href="/dashboard" className="text-white hover:text-gray-300">
+          <Link href="/documents" className="text-white hover:text-gray-300">
             <FiArrowLeft size={24} />
           </Link>
-          <h1 className="text-xl font-bold">Jorno App</h1>
+          <h1 className="text-xl font-bold">Go Back</h1>
         </div>
         
         <EditableTitle />

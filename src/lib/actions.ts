@@ -27,3 +27,12 @@ export async function deleteEntryTimeSheetDB(id: string) {
       throw new Error(error.message);
     }
   }
+
+  export async function updateEntryTimeSheetDB(data: Partial<TimesheetEntry>) {
+    try {
+      const response = await axios.put(`/api/timesheet/${data.id}`, data);
+      return response;
+    } catch (error: any) {
+      throw new Error(error.message);
+    }
+  }

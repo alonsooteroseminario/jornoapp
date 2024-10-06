@@ -2,7 +2,6 @@ import DocumentHeader from "@/app/components/DocumentHeader";
 import { ECLEnterpriseForm } from "@/app/components/ECLEnterpriseForm"
 
 const Document = async () => {
-    const documentTitle = "Test for Mario Romero";
     return (
         <div className="flex flex-col min-h-screen bg-gray-900 text-white">
             <DocumentHeader />
