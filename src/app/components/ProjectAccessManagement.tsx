@@ -7,6 +7,8 @@ import { closePopup } from '@/store/slice/popupSlice';
 const ProjectAccessManagement = ({ timesheetId }: { timesheetId: string }) => {
   const dispatch = useAppDispatch();
   const [email, setEmail] = useState('');
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [users, setUsers] = useState([
     { id: 1, name: 'Luis Alonso Otero Seminario', email: 'alonsoooteroseminario@gmail.com', role: 'Owner', avatar: '/api/placeholder/40/40' },
     { id: 2, name: 'Mario Romero', email: 'mario_1190@hotmail.com', role: 'can edit', avatar: null },
@@ -22,6 +24,21 @@ const ProjectAccessManagement = ({ timesheetId }: { timesheetId: string }) => {
       } catch (error) {
         console.error('Failed to share document:', error);
         // Handle error (e.g., show an error message to the user)
+      }
+    }
+  };
+  const handleShareSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setSuccess('');
+    if (email) {
+      try {
+
+        setEmail('');
+        setSuccess('Document shared successfully!');
+      } catch (error: any) {
+        console.error('Error sharing document:', error);
+        setError(error.message || 'Failed to share document. Please try again.');
       }
     }
   };
@@ -41,7 +58,7 @@ const ProjectAccessManagement = ({ timesheetId }: { timesheetId: string }) => {
         <label htmlFor="email" className="block text-sm font-medium text-gray-400 mb-2">
           Email address
         </label>
-        <div className="flex">
+        <form className="flex" onSubmit={handleShareSubmit}>
           <input
             type="email"
             id="email"
@@ -56,10 +73,11 @@ const ProjectAccessManagement = ({ timesheetId }: { timesheetId: string }) => {
           <button 
             className="bg-blue-600 text-white px-4 py-2 rounded-r-md hover:bg-blue-700"
             onClick={handleInvite}
+             type="submit"
           >
             Invite
           </button>
-        </div>
+        </form>
       </div>
       
       <ul className="space-y-4">

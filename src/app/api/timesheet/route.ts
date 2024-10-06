@@ -33,18 +33,8 @@ export async function POST(req: NextRequest) {
 
 export async function GET(req: NextRequest) {
   try {
-    const userEmail = req.headers.get('user-email');
-    if (!userEmail) {
-      return NextResponse.json({ error: 'User email is required' }, { status: 400 });
-    }
-
+ 
     const entries = await prisma.timesheetEntry.findMany({
-      where: {
-        OR: [
-          { user: { email: userEmail } },
-          { sharedWithEmails: { has: userEmail } }
-        ]
-      },
       include: {
         user: true,
       },

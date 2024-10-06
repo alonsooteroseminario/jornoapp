@@ -131,7 +131,23 @@ export const updateTimesheetEntry = createAsyncThunk(
   }
 );
 
-
+export const shareTimesheetEntry = createAsyncThunk(
+  'timesheet/shareEntry',
+  async ({ timesheetId, emailToShare }: { timesheetId: string, emailToShare: string }, thunkAPI) => {
+    try {
+      const response = await fetch('/api/timesheet/share', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ timesheetId, emailToShare }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error);
+      return data;
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error.message);
+    }
+  }
+);
 
 
 export const timesheetSlice = createSlice({
@@ -216,7 +232,7 @@ export const timesheetSlice = createSlice({
       state.error = null;
       console.log('Entries fetched:', action.payload);
       state.entries = action.payload;
-      // state.sharedEntries = action.payload.filter((entry: TimesheetEntry) => entry.sharedWithEmails);
+      state.sharedEntries = action.payload.filter((entry: TimesheetEntry) => entry.sharedWithEmails);;
     });
     builder.addCase(getEntries.rejected, (state, action) => {
       state.loading = false;
@@ -234,6 +250,22 @@ export const timesheetSlice = createSlice({
       state.loading = false;
       state.error = action.payload as string;
     });
+    builder
+    .addCase(shareTimesheetEntry.pending, (state) => {
+      state.loading = true;
+    })
+    .addCase(shareTimesheetEntry.fulfilled, (state, action) => {
+      state.loading = false;
+      const index = state.entries.findIndex(entry => entry.id === action.payload.id);
+      if (index !== -1) {
+        state.entries[index] = action.payload;
+      }
+    })
+    .addCase(shareTimesheetEntry.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload as string;
+    });
+    
   },
 })
 

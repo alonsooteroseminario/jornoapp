@@ -106,6 +106,7 @@ export const ECLEnterpriseForm: React.FC<ECLEnterpriseFormProps> = ({ documentId
               status: 'Draft',
               statusUpdatedAt: new Date().toISOString(),
             },
+            sharedWithEmails: []
           }
           const resultAction: any = dispatch(handleSubmitForm(timeSheet)).unwrap();
           console.log('Created timesheet succesfull:', resultAction);
@@ -202,9 +203,10 @@ export const ECLEnterpriseForm: React.FC<ECLEnterpriseFormProps> = ({ documentId
           name: documentName,
           description: '',
           updatedAt: new Date().toISOString(),
-          status: 'Updated',
+          status: 'Submitted',
           statusUpdatedAt: new Date().toISOString(),
         },
+        sharedWithEmails: []
       };
 
       if (uniqueId) {
@@ -215,7 +217,7 @@ export const ECLEnterpriseForm: React.FC<ECLEnterpriseFormProps> = ({ documentId
         console.log('Timesheet update successful:', resultAction);
       }
 
-      router.push('/documents');
+      // router.push('/documents');
 
 
     } catch (error) {

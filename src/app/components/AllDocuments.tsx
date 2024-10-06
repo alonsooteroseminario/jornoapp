@@ -1,6 +1,7 @@
 'use client';
 
 import DocumentListItem from "@/app/components/DocumentListItem"
+import SharedTimesheets from "@/app/components/SharedTimesheets";
 import { dateConverter } from "@/lib/utils"
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { 
@@ -82,7 +83,7 @@ export const AllDocuments = () => {
                     </div>
                 )}
             </div>
-
+            <SharedTimesheets />
           </div>
         )}
       </main>
