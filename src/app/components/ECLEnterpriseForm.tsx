@@ -64,6 +64,7 @@ export const ECLEnterpriseForm: React.FC<ECLEnterpriseFormProps> = ({ documentId
     numeroPlaque: form?.numeroPlaque || '',
     signature: form?.signature || '',
   });
+  const [pathURL, setPathURL] = useState('');
   const effectRan = useRef(false);
   useEffect(() => {
     if (effectRan.current) return;
@@ -74,7 +75,7 @@ export const ECLEnterpriseForm: React.FC<ECLEnterpriseFormProps> = ({ documentId
         const parts = path.split('/');
         const id = parts[parts.length - 1];
         console.log('id: ', id);
-
+        setPathURL(id);
         if (id === 'new' && !loading) {
           console.log('Creating a new document');
           // submit timesheet with name untitle and empty fields
@@ -145,9 +146,9 @@ export const ECLEnterpriseForm: React.FC<ECLEnterpriseFormProps> = ({ documentId
   useEffect(() => {
     if(uniqueId !==``) {
         console.log('uniqueId:', uniqueId);
-        router.push(`/documents/${uniqueId}`);
+
     }
-  }, [router, uniqueId]);
+  }, [pathURL, router, uniqueId]);
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prevData : any) => ({

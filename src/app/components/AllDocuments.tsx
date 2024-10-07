@@ -73,6 +73,7 @@ export const AllDocuments = () => {
                                   onDelete={()=>{
                                     handleDelete(entry?.id)
                                   }}
+                                  sharedWithEmails={entry?.sharedWithEmails || []}
                               />
                             )
                       })}
