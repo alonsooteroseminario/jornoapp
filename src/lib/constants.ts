@@ -42,6 +42,7 @@ export const mockEntries: TimesheetEntry[] = [
         status: 'Draft',
         statusUpdatedAt: '2021-10-01T00:00:00',
       },
+      sharedWithEmails: []
     },
     {
       id: '2',
@@ -66,7 +67,7 @@ export const mockEntries: TimesheetEntry[] = [
       totalHeuresSimple: '8',
       totalHeuresDouble: '0',
       totalVoyageSimple: '0',
-      totalVoyageDouble: '0',   
+      totalVoyageDouble: '0',
       materialTransported: 'Material Transported 2',
       autresPrecisions: 'Autres Precisions 2',
       ejesCamion: 'Ejes Camion 2',
@@ -78,12 +79,12 @@ export const mockEntries: TimesheetEntry[] = [
       metadata: {
         name: 'Timesheet 2',
         description: 'Timesheet Description 2',
-        createdBy
-        : 'User 2',     
+        createdBy: 'User 2',
         createdAt: '2021-10-02T00:00:00',
         updatedAt: '2021-10-02T00:00:00',
         status: 'Draft',
         statusUpdatedAt: '2021-10-02T00:00:00',
       },
+      sharedWithEmails: []
     },
   ];
