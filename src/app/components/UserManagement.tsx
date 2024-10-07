@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAppSelector } from '@/store/hooks';
 import { selectUser } from '@/store/slice/userSlice';
-
+import { Users } from 'lucide-react';
 
 interface User {
   id: string;
@@ -58,40 +58,45 @@ const UserManagement: React.FC = () => {
   }
 
   return (
-    <div className="overflow-x-auto justify-between items-center space-y-8">
-      <h2 className="text-3xl font-bold">User Management</h2>
-      <table className="min-w-full bg-white">
-        <thead className="bg-gray-800 text-white">
-          <tr>
-            <th className="py-2 px-4 text-left">Email</th>
-            <th className="py-2 px-4 text-left">Name</th>
-            <th className="py-2 px-4 text-left">Phone</th>
-            <th className="py-2 px-4 text-left">Company</th>
-            <th className="py-2 px-4 text-left">Role</th>
-          </tr>
-        </thead>
-        <tbody>
-          {users.map(user => (
-            <tr key={user.id} className="border-b">
-              <td className="py-2 px-4">{user.email}</td>
-              <td className="py-2 px-4">{`${user.firstName || ''} ${user.lastName || ''}`}</td>
-              <td className="py-2 px-4">{user.profile?.phoneNumber || 'N/A'}</td>
-              <td className="py-2 px-4">{user.profile?.company || 'N/A'}</td>
-              <td className="py-2 px-4">
-                <select
-                  value={user.role}
-                  onChange={(e) => handleRoleChange(user.id, e.target.value as 'ADMIN' | 'MANAGER' | 'USER')}
-                  className="border rounded p-1"
-                >
-                  <option value="ADMIN">Admin</option>
-                  <option value="MANAGER">Manager</option>
-                  <option value="USER">User</option>
-                </select>
-              </td>
+    <div className="bg-gray-900 text-white p-6 rounded-lg shadow-lg">
+      <div className="flex items-center mb-6">
+        <Users size={24} className="text-blue-500 mr-2" />
+        <h2 className="text-3xl font-bold">User Management</h2>
+      </div>
+      <div className="overflow-x-auto">
+        <table className="min-w-full bg-gray-800 rounded-lg overflow-hidden">
+          <thead className="bg-gray-700 text-gray-300">
+            <tr>
+              <th className="py-3 px-4 text-left">Email</th>
+              <th className="py-3 px-4 text-left">Name</th>
+              <th className="py-3 px-4 text-left">Phone</th>
+              <th className="py-3 px-4 text-left">Company</th>
+              <th className="py-3 px-4 text-left">Role</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {users.map(user => (
+              <tr key={user.id} className="border-b border-gray-700 hover:bg-gray-750">
+                <td className="py-3 px-4">{user.email}</td>
+                <td className="py-3 px-4">{`${user.firstName || ''} ${user.lastName || ''}`}</td>
+                <td className="py-3 px-4">{user.profile?.phoneNumber || 'N/A'}</td>
+                <td className="py-3 px-4">{user.profile?.company || 'N/A'}</td>
+                <td className="py-3 px-4">
+                  <select
+                    value={user.role}
+                    onChange={(e) => handleRoleChange(user.id, e.target.value as 'ADMIN' | 'MANAGER' | 'USER')}
+                    className="bg-gray-600 text-white border border-gray-500 rounded p-1"
+                  >
+                    <option value="ADMIN">Admin</option>
+                    <option value="MANAGER">Manager</option>
+                    <option value="USER">User</option>
+                  </select>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };

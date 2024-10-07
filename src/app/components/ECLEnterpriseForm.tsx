@@ -73,7 +73,7 @@ export const ECLEnterpriseForm: React.FC<ECLEnterpriseFormProps> = ({ documentId
         const path = window.location.pathname;
         console.log('Path:', path);
         const parts = path.split('/');
-        const id = parts[parts.length - 1];
+        const id = parts[parts.length - 1]; // window.location.pathname.split('/')
         console.log('id: ', id);
         setPathURL(id);
         if (id === 'new' && !loading) {
@@ -178,11 +178,14 @@ export const ECLEnterpriseForm: React.FC<ECLEnterpriseFormProps> = ({ documentId
     if (e && e.preventDefault) {
       e.preventDefault();
     }
-    console.log('Form submitted:', formData);
+    const path = window.location.pathname;
+    console.log('Path:', path);
+    const parts = path.split('/');
+    const id = parts[parts.length - 1]; 
 
     try {
       const timesheetData: Partial<TimesheetEntry> = {
-        id: uniqueId,
+        id: id,
         userId: clerkUser.id,
         client: formData?.client,
         workLocation: formData?.workLocation,
@@ -207,9 +210,9 @@ export const ECLEnterpriseForm: React.FC<ECLEnterpriseFormProps> = ({ documentId
           status: 'Submitted',
           statusUpdatedAt: new Date().toISOString(),
         },
-        sharedWithEmails: []
       };
 
+      console.log('Timesheet submitted:', timesheetData);
       if (uniqueId) {
         const resultAction = await dispatch(updateTimesheetEntry({
           id: uniqueId,

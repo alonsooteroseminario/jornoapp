@@ -74,6 +74,7 @@ export const AllDocuments = () => {
                                     handleDelete(entry?.id)
                                   }}
                                   sharedWithEmails={entry?.sharedWithEmails || []}
+                                  step={entry?.metadata?.status}
                               />
                             )
                       })}
